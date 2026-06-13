@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProLinguaCards-PT | Regular Verbs - 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary: #002776;
+        --accent: #ffdf00;
+        --success: #009c3b;
+        --glass: rgba(255, 255, 255, 0.8);
+        --shadow: 0 20px 40px rgba(0, 39, 118, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        overflow-x: hidden;
+      }
+
+      .brand {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .brand h1 {
+        font-weight: 800;
+        font-size: 32px;
+        color: var(--primary);
+        letter-spacing: -1px;
+      }
+      .brand span { color: var(--success); }
+
+      .progress-wrapper {
+        width: 100%;
+        max-width: 380px;
+        margin-bottom: 25px;
+      }
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+      }
+      .progress-bar {
+        height: 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      #progressFill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--success));
+        transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      /* FIX 1: min-height instead of fixed height so long phrases don't overflow */
+      .scene {
+        width: 100%;
+        max-width: 380px;
+        min-height: 260px;
+        perspective: 1200px;
+        /* Reserve space so layout doesn't jump */
+        position: relative;
+      }
+
+      .card {
+        width: 100%;
+        min-height: 260px;
+        position: relative;
+        transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        /* FIX 2: webkit prefix for iOS Safari */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        cursor: pointer;
+      }
+
+      .card.is-flipped {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+      }
+
+      /* FIX 3: Remove hover scale on touch devices — it interferes with the flip */
+      @media (hover: hover) {
+        .card:hover { transform: scale(1.02) rotateY(0deg); }
+        .card.is-flipped:hover { transform: scale(1.02) rotateY(180deg); }
+      }
+
+      .card-face {
+        position: absolute;
+        width: 100%;
+        min-height: 260px;
+        /* FIX 4: webkit prefix for backface — critical on iOS */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 30px;
+        padding: 30px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+        border: 1px solid white;
+      }
+
+      .card-front {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .card-back {
+        background: var(--primary);
+        color: white;
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+      }
+
+      .label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 16px;
+        opacity: 0.6;
+      }
+
+      /* FIX 5: Responsive font size so long phrases fit on small screens */
+      .phrase {
+        font-size: clamp(16px, 4vw, 24px);
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .controls {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        max-width: 380px;
+        margin-top: 40px;
+      }
+      .btn {
+        flex: 1;
+        padding: 18px;
+        border: none;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .btn-secondary { background: white; color: var(--primary); }
+      .btn-primary { background: var(--primary); color: white; }
+      .btn:active { transform: translateY(2px); }
+
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+      .pulse { animation: pulse 0.4s ease-in-out; }
+
+      .btn-shuffle {
+        margin-top: 20px;
+        background: transparent;
+        color: var(--primary);
+        border: 1.5px dashed var(--primary);
+        padding: 12px;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        width: 100%;
+        max-width: 380px;
+        transition: all 0.3s ease;
+        opacity: 0.7;
+      }
+      .btn-shuffle:hover {
+        opacity: 1;
+        background: rgba(0, 39, 118, 0.05);
+        transform: translateY(-1px);
+      }
+
+      /* FIX 6: Tap hint for mobile users */
+      .tap-hint {
+        font-size: 11px;
+        color: #888;
+        margin-top: 12px;
+        letter-spacing: 0.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <h1>ProLingua<span>Cards</span>-PT</h1>
+    </div>
+
+    <div class="progress-wrapper">
+      <div class="stats">
+        <span id="counter">PHRASE 1</span>
+        <span id="percent">0% COMPLETE</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="card" id="card" onclick="handleCardClick()">
+        <div class="card-face card-front">
+          <div class="label">English</div>
+          <div class="phrase" id="textEn">Loading...</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="label">Portuguese 🇧🇷</div>
+          <div class="phrase" id="textPt">Loading...</div>
+          <div style="margin-top: 20px; font-size: 24px">🔊</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="tap-hint">TAP CARD TO REVEAL & HEAR PRONUNCIATION</p>
+
+    <div class="controls">
+      <button class="btn btn-secondary" onclick="prev()">← Previous</button>
+      <button class="btn btn-primary" onclick="next()">Next →</button>
+    </div>
+    <button class="btn-shuffle" onclick="shuffle()">⇄ SHUFFLE DECK</button>
+
+    <script>
+      let deck = [
+          {en: "To speak: I speak Portuguese with my friends.", pt: "Falar: Eu falo português com os meus amigos."},
+          {en: "To study: She studies every night.", pt: "Estudar: Ela estuda toda noite."},
+          {en: "To work: We work from home.", pt: "Trabalhar: Nós trabalhamos de casa."},
+          {en: "To love: They love Brazilian food.", pt: "Gostar (Amar): Eles gostam de comida brasileira."},
+          {en: "To buy: He buys bread at the bakery.", pt: "Comprar: Ele compra pão na padaria."},
+          {en: "To travel: You travel a lot for work.", pt: "Viajar: Você viaja muito a trabalho."},
+          {en: "To call: I call my mother on Sundays.", pt: "Ligar: Eu ligo para a minha mãe aos domingos."},
+          {en: "To help: We help our neighbors.", pt: "Ajudar: A gente ajuda os nossos vizinhos."},
+          {en: "To arrive: The train arrives on time.", pt: "Chegar: O trem chega no horário."},
+          {en: "To eat: I eat pizza on weekends.", pt: "Comer: Eu como pizza nos fins de semana."},
+          {en: "To drink: She drinks water all day long.", pt: "Beber: Ela bebe água o dia todo."},
+          {en: "To learn: They learn quickly.", pt: "Aprender: Eles aprendem rápido."},
+          {en: "To understand: Do you understand the lesson?", pt: "Entender: Você entende a lição?"},
+          {en: "To run: We run in the park every morning.", pt: "Correr: Nós corremos no parque toda manhã."},
+          {en: "To sell: He sells cars.", pt: "Vender: Ele vende carros."},
+          {en: "To write: I write emails every day.", pt: "Escrever: Eu escrevo e-mails todo dia."},
+          {en: "To live: She lives in São Paulo.", pt: "Morar: Ela mora em São Paulo."},
+          {en: "To open: They open the store at eight.", pt: "Abrir: Eles abrem a loja às oito."},
+          {en: "To share: We share the dessert.", pt: "Dividir: A gente divide a sobremesa."},
+          {en: "To decide: You decide the place.", pt: "Decidir: Você decide o lugar."},
+          {en: "To watch: He watches the game on TV.", pt: "Assistir: Ele assiste ao jogo na TV."},
+          {en: "To permit/allow: The hotel allows pets.", pt: "Permitir: O hotel permite animais de estimação."},
+          {en: "To fulfill/comply: They fulfill their promises.", pt: "Cumprir: Eles cumprem as promessas."},
+          {en: "To print: I print the documents now.", pt: "Imprimir: Eu imprimo os documentos agora."},
+          {en: "To receive: We receive many visits.", pt: "Receber: Nós recebemos muitas visitas."}
+
+
+      ];
+
+      let index = 0;
+      const card = document.getElementById("card");
+      const progressFill = document.getElementById("progressFill");
+      const counter = document.getElementById("counter");
+      const percent = document.getElementById("percent");
+
+      // FIX 7: Pre-warm speech synthesis on first user gesture (required on iOS/Android)
+      let speechReady = false;
+      function primeSpeech() {
+        if (speechReady) return;
+        const warm = new SpeechSynthesisUtterance("");
+        warm.volume = 0;
+        window.speechSynthesis.speak(warm);
+        speechReady = true;
+      }
+      document.addEventListener("touchstart", primeSpeech, { once: true });
+      document.addEventListener("click", primeSpeech, { once: true });
+
+      function speak(text) {
+        window.speechSynthesis.cancel();
+        // FIX 8: Small delay prevents iOS from swallowing the utterance after cancel()
+        setTimeout(() => {
+          const msg = new SpeechSynthesisUtterance(text);
+          msg.lang = "pt-BR";
+          msg.rate = 0.8;
+          window.speechSynthesis.speak(msg);
+        }, 50);
+      }
+
+      function handleCardClick() {
+        if (!card.classList.contains("is-flipped")) {
+          card.classList.add("is-flipped");
+          speak(deck[index].pt);
+        } else {
+          card.classList.add("pulse");
+          setTimeout(() => card.classList.remove("pulse"), 400);
+          speak(deck[index].pt);
+        }
+      }
+
+      function update() {
+        card.classList.remove("is-flipped");
+        const currentProgress = ((index + 1) / deck.length) * 100;
+        setTimeout(() => {
+          document.getElementById("textEn").innerText = deck[index].en;
+          document.getElementById("textPt").innerText = deck[index].pt;
+          counter.innerText = `PHRASE ${index + 1} OF ${deck.length}`;
+          percent.innerText = `${Math.round(currentProgress)}% COMPLETE`;
+          progressFill.style.width = currentProgress + "%";
+        }, 300);
+      }
+
+      function next() {
+        index = (index + 1) % deck.length;
+        update();
+      }
+
+      function prev() {
+        index = (index - 1 + deck.length) % deck.length;
+        update();
+      }
+
+      function shuffle() {
+        deck.sort(() => Math.random() - 0.5);
+        index = 0;
+        update();
+      }
+
+      update();
+    </script>
+  </body>
+</html>
