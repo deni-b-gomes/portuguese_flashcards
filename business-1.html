@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProLinguaCards-PT | Business 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary: #002776;
+        --accent: #ffdf00;
+        --success: #009c3b;
+        --glass: rgba(255, 255, 255, 0.8);
+        --shadow: 0 20px 40px rgba(0, 39, 118, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        overflow-x: hidden;
+      }
+
+      .brand {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .brand h1 {
+        font-weight: 800;
+        font-size: 32px;
+        color: var(--primary);
+        letter-spacing: -1px;
+      }
+      .brand span { color: var(--success); }
+
+      .progress-wrapper {
+        width: 100%;
+        max-width: 380px;
+        margin-bottom: 25px;
+      }
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+      }
+      .progress-bar {
+        height: 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      #progressFill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--success));
+        transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      /* FIX 1: min-height instead of fixed height so long phrases don't overflow */
+      .scene {
+        width: 100%;
+        max-width: 380px;
+        min-height: 260px;
+        perspective: 1200px;
+        /* Reserve space so layout doesn't jump */
+        position: relative;
+      }
+
+      .card {
+        width: 100%;
+        min-height: 260px;
+        position: relative;
+        transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        /* FIX 2: webkit prefix for iOS Safari */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        cursor: pointer;
+      }
+
+      .card.is-flipped {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+      }
+
+      /* FIX 3: Remove hover scale on touch devices — it interferes with the flip */
+      @media (hover: hover) {
+        .card:hover { transform: scale(1.02) rotateY(0deg); }
+        .card.is-flipped:hover { transform: scale(1.02) rotateY(180deg); }
+      }
+
+      .card-face {
+        position: absolute;
+        width: 100%;
+        min-height: 260px;
+        /* FIX 4: webkit prefix for backface — critical on iOS */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 30px;
+        padding: 30px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+        border: 1px solid white;
+      }
+
+      .card-front {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .card-back {
+        background: var(--primary);
+        color: white;
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+      }
+
+      .label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 16px;
+        opacity: 0.6;
+      }
+
+      /* FIX 5: Responsive font size so long phrases fit on small screens */
+      .phrase {
+        font-size: clamp(16px, 4vw, 24px);
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .controls {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        max-width: 380px;
+        margin-top: 40px;
+      }
+      .btn {
+        flex: 1;
+        padding: 18px;
+        border: none;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .btn-secondary { background: white; color: var(--primary); }
+      .btn-primary { background: var(--primary); color: white; }
+      .btn:active { transform: translateY(2px); }
+
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+      .pulse { animation: pulse 0.4s ease-in-out; }
+
+      .btn-shuffle {
+        margin-top: 20px;
+        background: transparent;
+        color: var(--primary);
+        border: 1.5px dashed var(--primary);
+        padding: 12px;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        width: 100%;
+        max-width: 380px;
+        transition: all 0.3s ease;
+        opacity: 0.7;
+      }
+      .btn-shuffle:hover {
+        opacity: 1;
+        background: rgba(0, 39, 118, 0.05);
+        transform: translateY(-1px);
+      }
+
+      /* FIX 6: Tap hint for mobile users */
+      .tap-hint {
+        font-size: 11px;
+        color: #888;
+        margin-top: 12px;
+        letter-spacing: 0.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <h1>ProLingua<span>Cards</span>-PT</h1>
+    </div>
+
+    <div class="progress-wrapper">
+      <div class="stats">
+        <span id="counter">PHRASE 1</span>
+        <span id="percent">0% COMPLETE</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="card" id="card" onclick="handleCardClick()">
+        <div class="card-face card-front">
+          <div class="label">English</div>
+          <div class="phrase" id="textEn">Loading...</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="label">Portuguese 🇧🇷</div>
+          <div class="phrase" id="textPt">Loading...</div>
+          <div style="margin-top: 20px; font-size: 24px">🔊</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="tap-hint">TAP CARD TO REVEAL & HEAR PRONUNCIATION</p>
+
+    <div class="controls">
+      <button class="btn btn-secondary" onclick="prev()">← Previous</button>
+      <button class="btn btn-primary" onclick="next()">Next →</button>
+    </div>
+    <button class="btn-shuffle" onclick="shuffle()">⇄ SHUFFLE DECK</button>
+
+    <script>
+      let deck = [
+        // Section 1: Meeting & Communication Essentials
+      {en: "Good morning, how can I help you?", pt: "Bom dia, como posso ajudar?"},
+      {en: "Could you please repeat that?", pt: "Você poderia repetir, por favor?"},
+      {en: "I'll be right with you.", pt: "Estou à disposição em um instante."},
+      {en: "I didn't quite catch that.", pt: "Eu não entendi muito bem."},
+      {en: "Let's schedule a meeting.", pt: "Vamos marcar uma reunião."},
+      {en: "I am sending you the link now.", pt: "Estou te enviando o link agora."},
+      {en: "Can everyone hear me?", pt: "Todos conseguem me ouvir?"},
+      {en: "Your microphone is muted.", pt: "Seu microfone está desligado."},
+      {en: "I will share my screen.", pt: "Vou compartilhar a minha tela."},
+      {en: "Does anyone have any questions?", pt: "Alguém tem alguma dúvida?"},
+
+      // Section 2: Administrative Tasks
+      {en: "I will take care of the paperwork.", pt: "Eu vou cuidar da papelada."},
+      {en: "The document is attached.", pt: "O documento está em anexo."},
+      {en: "I need your signature here.", pt: "Preciso da sua assinatura aqui."},
+      {en: "When is the deadline?", pt: "Qual é o prazo de entrega?"},
+      {en: "I am out of the office today.", pt: "Estou fora do escritório hoje."},
+      {en: "Please CC me on that email.", pt: "Por favor, me coloque em cópia nesse e-mail."},
+      {en: "I will forward this to the manager.", pt: "Vou encaminhar isso para o gerente."},
+      {en: "We need to update the spreadsheet.", pt: "Precisamos atualizar a planilha."},
+      {en: "Is the report ready?", pt: "O relatório está pronto?"},
+      {en: "I will print the copies now.", pt: "Vou imprimir as cópias agora."},
+
+      // Section 3: Professional Interactions
+      {en: "It was a pleasure meeting you.", pt: "Foi um prazer conhecê-lo."},
+      {en: "I look forward to your reply.", pt: "Fico no aguardo da sua resposta."},
+      {en: "Thank you for your patience.", pt: "Obrigado pela sua paciência."},
+      {en: "Let's stay in touch.", pt: "Vamos manter contato."},
+      {en: "I agree with this point.", pt: "Eu concordo com este ponto."},
+      {en: "I have a suggestion.", pt: "Eu tenho uma sugestão."},
+      {en: "Let's discuss this later.", pt: "Vamos discutir isso mais tarde."},
+      {en: "I am responsible for this project.", pt: "Eu sou responsável por este projeto."},
+      {en: "We are on the right track.", pt: "Estamos no caminho certo."},
+      {en: "What is the next step?", pt: "Qual é o próximo passo?"},
+
+      // Section 4: Office & Tech (Great for IT-focused roles)
+      {en: "The system is down.", pt: "O sistema está fora do ar."},
+      {en: "I need to reset my password.", pt: "Preciso redefinir minha senha."},
+      {en: "The Wi-Fi isn't working.", pt: "O Wi-Fi não está funcionando."},
+      {en: "I will open a support ticket.", pt: "Vou abrir um chamado de suporte."},
+      {en: "The file is too large to send.", pt: "O arquivo é grande demais para enviar."},
+      {en: "I am downloading the software.", pt: "Estou baixando o software."},
+      {en: "Is there a backup of this?", pt: "Existe um backup disso?"},
+      {en: "The server is being updated.", pt: "O servidor está sendo atualizado."},
+      {en: "I need technical assistance.", pt: "Preciso de assistência técnica."},
+      {en: "Please restart your computer.", pt: "Por favor, reinicie o seu computador."},
+
+      // Section 5: Time & Productivity
+      {en: "I am running five minutes late.", pt: "Estou cinco minutos atrasado."},
+      {en: "The meeting has been canceled.", pt: "A reunião foi cancelada."},
+      {en: "Can we postpone the call?", pt: "Podemos adiar a chamada?"},
+      {en: "I have a full schedule today.", pt: "Minha agenda está cheia hoje."},
+      {en: "I'll finish this by the end of the day.", pt: "Vou terminar isso até o fim do dia."},
+      {en: "Let's take a quick break.", pt: "Vamos fazer um intervalo rápido."},
+      {en: "What time does the office close?", pt: "A que horas o escritório fecha?"},
+      {en: "I am taking my lunch break now.", pt: "Vou fazer meu intervalo de almoço agora."},
+      {en: "I will be back in an hour.", pt: "Volto em uma hora."},
+      {en: "Have a great weekend!", pt: "Tenha um ótimo fim de semana!"}
+      ];
+
+      let index = 0;
+      const card = document.getElementById("card");
+      const progressFill = document.getElementById("progressFill");
+      const counter = document.getElementById("counter");
+      const percent = document.getElementById("percent");
+
+      // FIX 7: Pre-warm speech synthesis on first user gesture (required on iOS/Android)
+      let speechReady = false;
+      function primeSpeech() {
+        if (speechReady) return;
+        const warm = new SpeechSynthesisUtterance("");
+        warm.volume = 0;
+        window.speechSynthesis.speak(warm);
+        speechReady = true;
+      }
+      document.addEventListener("touchstart", primeSpeech, { once: true });
+      document.addEventListener("click", primeSpeech, { once: true });
+
+      function speak(text) {
+        window.speechSynthesis.cancel();
+        // FIX 8: Small delay prevents iOS from swallowing the utterance after cancel()
+        setTimeout(() => {
+          const msg = new SpeechSynthesisUtterance(text);
+          msg.lang = "pt-BR";
+          msg.rate = 0.8;
+          window.speechSynthesis.speak(msg);
+        }, 50);
+      }
+
+      function handleCardClick() {
+        if (!card.classList.contains("is-flipped")) {
+          card.classList.add("is-flipped");
+          speak(deck[index].pt);
+        } else {
+          card.classList.add("pulse");
+          setTimeout(() => card.classList.remove("pulse"), 400);
+          speak(deck[index].pt);
+        }
+      }
+
+      function update() {
+        card.classList.remove("is-flipped");
+        const currentProgress = ((index + 1) / deck.length) * 100;
+        setTimeout(() => {
+          document.getElementById("textEn").innerText = deck[index].en;
+          document.getElementById("textPt").innerText = deck[index].pt;
+          counter.innerText = `PHRASE ${index + 1} OF ${deck.length}`;
+          percent.innerText = `${Math.round(currentProgress)}% COMPLETE`;
+          progressFill.style.width = currentProgress + "%";
+        }, 300);
+      }
+
+      function next() {
+        index = (index + 1) % deck.length;
+        update();
+      }
+
+      function prev() {
+        index = (index - 1 + deck.length) % deck.length;
+        update();
+      }
+
+      function shuffle() {
+        deck.sort(() => Math.random() - 0.5);
+        index = 0;
+        update();
+      }
+
+      update();
+    </script>
+  </body>
+</html>
