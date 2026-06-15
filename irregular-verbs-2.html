@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TLR - Try Learn Repeat | Irregular Verbs-2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary: #002776;
+        --accent: #ffdf00;
+        --success: #009c3b;
+        --glass: rgba(255, 255, 255, 0.8);
+        --shadow: 0 20px 40px rgba(0, 39, 118, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        overflow-x: hidden;
+      }
+
+      .brand {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .brand h1 {
+        font-weight: 800;
+        font-size: 32px;
+        color: var(--primary);
+        letter-spacing: -1px;
+      }
+      .brand span { color: var(--success); }
+
+      .progress-wrapper {
+        width: 100%;
+        max-width: 380px;
+        margin-bottom: 25px;
+      }
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+      }
+      .progress-bar {
+        height: 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      #progressFill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--success));
+        transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      /* FIX 1: min-height instead of fixed height so long phrases don't overflow */
+      .scene {
+        width: 100%;
+        max-width: 380px;
+        min-height: 260px;
+        perspective: 1200px;
+        /* Reserve space so layout doesn't jump */
+        position: relative;
+      }
+
+      .card {
+        width: 100%;
+        min-height: 260px;
+        position: relative;
+        transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        /* FIX 2: webkit prefix for iOS Safari */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        cursor: pointer;
+      }
+
+      .card.is-flipped {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+      }
+
+      /* FIX 3: Remove hover scale on touch devices — it interferes with the flip */
+      @media (hover: hover) {
+        .card:hover { transform: scale(1.02) rotateY(0deg); }
+        .card.is-flipped:hover { transform: scale(1.02) rotateY(180deg); }
+      }
+
+      .card-face {
+        position: absolute;
+        width: 100%;
+        min-height: 260px;
+        /* FIX 4: webkit prefix for backface — critical on iOS */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 30px;
+        padding: 30px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+        border: 1px solid white;
+      }
+
+      .card-front {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .card-back {
+        background: var(--primary);
+        color: white;
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+      }
+
+      .label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 16px;
+        opacity: 0.6;
+      }
+
+      /* FIX 5: Responsive font size so long phrases fit on small screens */
+      .phrase {
+        font-size: clamp(16px, 4vw, 24px);
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .controls {
+        display: flex;
+        gap: 15px;
+        width: 100%;
+        max-width: 380px;
+        margin-top: 40px;
+      }
+      .btn {
+        flex: 1;
+        padding: 18px;
+        border: none;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .btn-secondary { background: white; color: var(--primary); }
+      .btn-primary { background: var(--primary); color: white; }
+      .btn:active { transform: translateY(2px); }
+
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+      .pulse { animation: pulse 0.4s ease-in-out; }
+
+      .btn-shuffle {
+        margin-top: 20px;
+        background: transparent;
+        color: var(--primary);
+        border: 1.5px dashed var(--primary);
+        padding: 12px;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        width: 100%;
+        max-width: 380px;
+        transition: all 0.3s ease;
+        opacity: 0.7;
+      }
+      .btn-shuffle:hover {
+        opacity: 1;
+        background: rgba(0, 39, 118, 0.05);
+        transform: translateY(-1px);
+      }
+
+      /* FIX 6: Tap hint for mobile users */
+      .tap-hint {
+        font-size: 11px;
+        color: #888;
+        margin-top: 12px;
+        letter-spacing: 0.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <h1>TLR <span>Portuguese FlashCards</span></h1>
+    </div>
+
+    <div class="progress-wrapper">
+      <div class="stats">
+        <span id="counter">PHRASE 1</span>
+        <span id="percent">0% COMPLETE</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="card" id="card" onclick="handleCardClick()">
+        <div class="card-face card-front">
+          <div class="label">English</div>
+          <div class="phrase" id="textEn">Loading...</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="label">Portuguese 🇧🇷</div>
+          <div class="phrase" id="textPt">Loading...</div>
+          <div style="margin-top: 20px; font-size: 24px">🔊</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="tap-hint">TAP CARD TO REVEAL & HEAR PRONUNCIATION</p>
+
+    <div class="controls">
+      <button class="btn btn-secondary" onclick="prev()">← Previous</button>
+      <button class="btn btn-primary" onclick="next()">Next →</button>
+    </div>
+    <button class="btn-shuffle" onclick="shuffle()">⇄ SHUFFLE DECK</button>
+
+    <script>
+      let deck = [
+        {en: "To fall - Be careful or you'll fall from that chair.", pt: "Cair - Cuidado para você não cair dessa cadeira."},
+    {en: "To leave/go out - What time do you leave work today?", pt: "Sair - Que horas você sai do trabalho hoje?"},
+    {en: "To come - Are you coming to the barbecue on Sunday?", pt: "Vir - Você vem pro churrasco no domingo?"},
+    {en: "To sleep - I usually sleep late on weekends.", pt: "Dormir - Eu costumo dormir tarde nos finais de semana."},
+    {en: "To follow - Follow this street until the gas station.", pt: "Seguir - Siga esta rua até o posto de gasolina."},
+    {en: "To get/obtain - How did you get tickets for the concert?", pt: "Conseguir - Como você conseguiu ingressos para o show?"},
+    {en: "To believe - I don't believe everything I see on the internet.", pt: "Crer - Eu não creio em tudo o que vejo na internet."},
+    {en: "To hate - He hates waking up early on Mondays.", pt: "Odiar - Ele odeia acordar cedo na segunda-feira."},
+    {en: "To feel - I feel much better after a hot shower.", pt: "Sentir - Eu me sinto bem melhor depois de um banho quente."},
+    {en: "To cover - Cover the pan so the rice cooks faster.", pt: "Cobrir - Cubra a panela para o arroz cozinhar mais rápido."},
+    {en: "To build - They build custom houses in this neighborhood.", pt: "Construir - Eles constroem casas personalizadas neste bairro."},
+    {en: "To smile - She always smiles when she talks about her dog.", pt: "Sorrir - Ela sempre sorri quando fala do cachorro dela."},
+    {en: "To foresee/predict - I foresee problems if we don't plan well.", pt: "Prever - Eu prevejo problemas se a gente não se planejar bem."},
+    {en: "To run away - The cat runs away every time it hears a loud noise.", pt: "Fugir - O gato foge toda vez que ouve um barulho alto."},
+    {en: "To value/be worth - I value your friendship very much.", pt: "Valer - Eu valho muito a sua amizade."},
+    {en: "To prevent - Good planning prevents major mistakes.", pt: "Prevenir - Um bom planejamento previne grandes erros."},
+    {en: "To reward/repay - He repays the favor with a beautiful smile.", pt: "Retribuir - Ele retribui o favor com um belo sorriso."},
+    {en: "To possess/have - This museum possesses an incredible collection.", pt: "Possuir - Este museu possui um acervo incrível."},
+    {en: "To display/exhibit - She displays her art in a local gallery.", pt: "Exibir - Ela exibe sua arte em uma galeria local."},
+    {en: "To guide/conduct - The tour guide conducts the visitors through the historic center.", pt: "Conduzir - O guia conduz os visitantes pelo centro histórico."},
+    {en: "To repeat - Can you repeat that explanation, please?", pt: "Repetir - Você pode repetir essa explicação, por favor?"},
+    {en: "To discover - Scientists discover a new planet in another galaxy.", pt: "Descobrir - Cientistas descobrem um novo planeta em outra galáxia."},
+    {en: "To dress - I always dress warmly when it's cold outside.", pt: "Vestir - Eu sempre me visto com roupas quentes quando está frio lá fora."},
+    {en: "To destroy - The storm destroys part of the coastal road.", pt: "Destruir - A tempestade destrói parte da estrada costeira."},
+    {en: "To rise/go up - The price of gasoline rises almost every month.", pt: "Subir - O preço da gasolina sobe quase todo mês."}
+
+
+
+      ];
+
+      let index = 0;
+      const card = document.getElementById("card");
+      const progressFill = document.getElementById("progressFill");
+      const counter = document.getElementById("counter");
+      const percent = document.getElementById("percent");
+
+      // FIX 7: Pre-warm speech synthesis on first user gesture (required on iOS/Android)
+      let speechReady = false;
+      function primeSpeech() {
+        if (speechReady) return;
+        const warm = new SpeechSynthesisUtterance("");
+        warm.volume = 0;
+        window.speechSynthesis.speak(warm);
+        speechReady = true;
+      }
+      document.addEventListener("touchstart", primeSpeech, { once: true });
+      document.addEventListener("click", primeSpeech, { once: true });
+
+      function speak(text) {
+        window.speechSynthesis.cancel();
+        // FIX 8: Small delay prevents iOS from swallowing the utterance after cancel()
+        setTimeout(() => {
+          const msg = new SpeechSynthesisUtterance(text);
+          msg.lang = "pt-BR";
+          msg.rate = 0.8;
+          window.speechSynthesis.speak(msg);
+        }, 50);
+      }
+
+      function handleCardClick() {
+        if (!card.classList.contains("is-flipped")) {
+          card.classList.add("is-flipped");
+          speak(deck[index].pt);
+        } else {
+          card.classList.add("pulse");
+          setTimeout(() => card.classList.remove("pulse"), 400);
+          speak(deck[index].pt);
+        }
+      }
+
+      function update() {
+        card.classList.remove("is-flipped");
+        const currentProgress = ((index + 1) / deck.length) * 100;
+        setTimeout(() => {
+          document.getElementById("textEn").innerText = deck[index].en;
+          document.getElementById("textPt").innerText = deck[index].pt;
+          counter.innerText = `PHRASE ${index + 1} OF ${deck.length}`;
+          percent.innerText = `${Math.round(currentProgress)}% COMPLETE`;
+          progressFill.style.width = currentProgress + "%";
+        }, 300);
+      }
+
+      function next() {
+        index = (index + 1) % deck.length;
+        update();
+      }
+
+      function prev() {
+        index = (index - 1 + deck.length) % deck.length;
+        update();
+      }
+
+      function shuffle() {
+        deck.sort(() => Math.random() - 0.5);
+        index = 0;
+        update();
+      }
+
+      update();
+    </script>
+  </body>
+</html>
